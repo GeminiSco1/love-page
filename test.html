@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>最最最最最喜欢你啦</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        .container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .content {
+            font-size: 36px;
+            font-weight: bold;
+            color: #f00;
+            white-space: nowrap;
+        }
+        #playButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            z-index: 1000;
+            background-color: #fff0f0;
+            border: 1px solid #ff7a7a;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="pinkboard"></canvas>
+
+    <div class="container">
+        <div class="content">我超超超超超喜欢你！</div>
+    </div>
+
+    <audio id="bgmMusic" src="./有我呢.mp3" preload="auto" loop></audio>
+    <button id="playButton">点击播放音乐 🎵</button>
+
+    <script>
+        // 播放按钮点击触发音乐
+        document.getElementById('playButton').addEventListener('click', function () {
+            const music = document.getElementById('bgmMusic');
+            music.play().then(() => {
+                this.style.display = 'none';  // 隐藏按钮
+            }).catch((e) => {
+                alert("播放失败，请确认浏览器允许播放音频");
+                console.error(e);
+            });
+        });
+
+        // 鼠标点击页面任意位置也可触发音乐播放（备用方案）
+        function enableMusic() {
+            const music = document.getElementById('bgmMusic');
+            music.play().catch(e => {
+                console.log("用户尚未交互，无法自动播放音频。");
+            });
+            document.body.removeEventListener('click', enableMusic);
+        }
+
+        document.body.addEventListener('click', enableMusic);
+
+        // 背景特效代码（保持原样）
+        (function () {
+            var canvas = document.getElementById("pinkboard");
+            var ctx = canvas.getContext("2d");
+
+            var width = window.innerWidth;
+            var height = window.innerHeight;
+
+            canvas.width = width;
+            canvas.height = height;
+
+            function Heart(x, y, size, alpha, speed) {
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.alpha = alpha;
+                this.speed = speed;
+                this.draw = function () {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.scale(this.size, this.size);
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.bezierCurveTo(0, -3, -5, -15, -25, -15);
+                    ctx.bezierCurveTo(-55, -15, -55, 22.5, -55, 22.5);
+                    ctx.bezierCurveTo(-55, 40, -35, 62, 0, 80);
+                    ctx.bezierCurveTo(35, 62, 55, 40, 55, 22.5);
+                    ctx.bezierCurveTo(55, 22.5, 55, -15, 25, -15);
+                    ctx.bezierCurveTo(10, -15, 0, -3, 0, 0);
+                    ctx.closePath();
+                    ctx.fillStyle = "rgba(255,0,0," + this.alpha + ")";
+                    ctx.fill();
+                    ctx.restore();
+                };
+                this.update = function () {
+                    this.y -= this.speed;
+                    this.alpha -= 0.005;
+                    if (this.alpha <= 0) {
+                        this.reset();
+                    }
+                };
+                this.reset = function () {
+                    this.x = Math.random() * width;
+                    this.y = height + Math.random() * 100;
+                    this.size = Math.random() * 0.5 + 0.2;
+                    this.alpha = Math.random() * 0.5 + 0.5;
+                    this.speed = Math.random() * 1.5 + 0.5;
+                };
+            }
+
+            var hearts = [];
+            for (var i = 0; i < 100; i++) {
+                var heart = new Heart(
+                    Math.random() * width,
+                    Math.random() * height,
+                    Math.random() * 0.5 + 0.2,
+                    Math.random() * 0.5 + 0.5,
+                    Math.random() * 1.5 + 0.5
+                );
+                hearts.push(heart);
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                for (var i = 0; i < hearts.length; i++) {
+                    hearts[i].draw();
+                    hearts[i].update();
+                }
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+
+            window.addEventListener("resize", function () {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            });
+        })();
+    </script>
+</body>
+</html>
